@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.model.mapper.UserMapper">
+
+	<resultMap type="User" id="user">
+		<result column="idx" property="idx" />
+		<result column="userId" property="userId" />
+		<result column="name" property="name" />
+		<result column="img" property="img" />
+	</resultMap>
+	
+	<select id="idCheck" parameterType="User" resultType="int">
+		select count(*) from user where userId = #{userId}
+	</select>
+
+	<insert id="add" parameterType="User">
+		insert into user (userId, pass,
+		name, phone, img)
+		values (#{userId},#{pass},#{name},#{phone},#{img})
+	</insert>
+	
+	<select id="insertImg" parameterType="User">
+		insert into fileinfo(userId,originFile,saveFile,saveFolder)
+		values (#{userId},#{fileInfo.originFile},#{fileInfo.saveFile},#{fileInfo.saveFolder})
+		on duplicate KEY  UPDATE originFile = #{fileInfo.originFile},saveFile=#{fileInfo.saveFile},saveFolder=#{fileInfo.saveFolder}
+		
+	</select>
+	<select id = "setUserImg" parameterType = "User">
+		update user set img = #{img} where userId = #{userId}
+	</select>
+
+	
+	<select id="login" parameterType="User" resultType="User">
+		select idx,
+		userId, name, phone ,img, registerDate
+		from user
+		where userId =
+		#{userId} and
+		pass = #{pass}
+	</select>
+
+	<select id="findPass" parameterType="User" resultType="User">
+		select idx,
+		userId, pass,name, phone ,img, registerDate
+		from user
+		where userId = #{userId} 
+		and	name = #{name}
+	</select>
+
+	<update id="edit" parameterType="User">
+		update user
+		<trim prefix="set" suffixOverrides=",">
+			<if test="pass != null">pass = #{pass},</if>
+			<if test="name != null">name = #{name},</if>
+			<if test="phone != null">phone = #{phone},</if>
+			<if test="img != null">img = #{img},</if>
+		</trim>
+		where userId = #{userId}
+	</update>
+
+	<delete id="delete" parameterType="User">
+		delete from user
+		where userId =
+		#{userId}
+		and pass = #{pass}
+	</delete>
+
+</mapper>

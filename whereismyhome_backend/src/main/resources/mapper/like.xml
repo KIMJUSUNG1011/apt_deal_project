@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.model.mapper.LikeMapper">
+	<insert id="registLikeApt" parameterType="like">
+		insert into likeapt (user_idx,
+		sidoName, gugunName, dongName)
+		values(#{user_idx}, #{sidoName},
+		#{gugunName}, #{dongName})
+	</insert>
+	<select id="getLikeRegion" resultType="like">
+		select
+		like_idx,sidoName,gugunName,dongName
+		from likeapt
+		where
+		user_idx=#{user_idx}
+	</select>
+	<delete id="deleteLikeRegion" parameterType="Like">
+		delete from likeapt
+		where like_idx = #{like_idx}
+	</delete>
+</mapper>

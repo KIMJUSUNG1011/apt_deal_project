@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.model.mapper.AptMapper">
+
+	<!-- 시도, 구군, 동 정보가 전달되면 해당하는 동 코드를 리턴 --> 
+	<select id="getDongCode" resultType="string">
+		select dongCode 
+		from dongcode 
+		where sidoName=#{param1} and gugunName=#{param2} and dongName=#{param3}
+	</select>
+	
+	<!-- 시도 정보 가져오기 --> 
+	<select id="getSidoName" resultType="string">
+		select sidoName 
+		from dongcode 
+		where right(dongcode, 8) = '00000000'
+	</select>
+
+	<!-- 구군 정보 가져오기 --> 
+	<select id="getGugunName" resultType="string">
+		select gugunName 
+		from dongcode 
+		where sidoName = #{param1} and right(dongcode, 5)='00000' and gugunName is not null
+	</select>
+	
+	<!-- 동 정보 가져오기 -->
+	<select id="getDongName" resultType="String">
+		select dongName 
+		from dongcode 
+		where sidoName = #{param1} and gugunName = #{param2} and dongName is not null
+	</select>
+
+	<!-- 총  아파트 상세정보 개수 출력 -->
+	<select id="countApt" resultType="int">
+		select count(*) from houseinfo where dongcode = ${param1}
+	</select>
+	
+	<!-- 아파트 상세 조회 리스트 -->
+	<select id="getAptDetail" resultType="apt">
+	select	 
+		A.aptCode, 
+		A.apartmentName, 
+    	A.roadName, 
+    	A.buildYear, 
+    	A.lng, 
+    	A.lat,
+    	A.img,
+    	A.jibun,
+		round(sum(dealAmount) / count(*), 2) dealAmount, 
+    	round(sum(area) / count(*), 2) area
+	from houseInfo A, housedeal B
+	where A.dongCode = ${param1} and A.aptCode = B.aptCode
+	group by A.aptCode
+	limit #{vo.start}, #{vo.end}
+	</select>
+	
+	<!-- 검색을 통한 상세 조회 -->
+	<select id="getAptDetail2" resultType="apt">
+	select	 
+		A.aptCode, 
+		A.apartmentName, 
+    	A.roadName, 
+    	A.buildYear, 
+    	A.lng, 
+    	A.lat,
+    	A.img,
+		round(sum(dealAmount) / count(*), 2) dealAmount, 
+    	round(sum(area) / count(*), 2) area
+	from houseInfo A, housedeal B
+	where A.dongCode = ${param1} and A.aptCode = B.aptCode and A.apartmentName like '%${param3}%'
+	group by A.aptCode
+	limit #{vo.start}, #{vo.end}
+	</select>
+
+	<!-- 특정  아파트 거래 내역 개수 출력 -->
+	<select id="countAptDeal" resultType="int">
+		select count(*) from housedeal where aptCode = ${param1}
+	</select>
+
+	<!-- 특정 아파트 거래내역 조회 -->
+	<select id="getAptDeal" resultType="apt">
+		select dealAmount, dealYear, dealMonth, dealDay, floor, area
+		from housedeal
+		where aptCode = ${param1}
+		order by concat(concat(dealYear, '-', lpad(dealMonth, 2, '0')), '-', lpad(dealDay, 2, '0')) desc
+		limit #{vo.start}, #{vo.end}
+	</select>
+	
+	<!-- 크롤링 -->
+	<update id="crawling" parameterType="String">
+		update houseinfo
+		set img='${param2}'
+		where apartmentName='${param1}'
+	</update>
+
+</mapper>

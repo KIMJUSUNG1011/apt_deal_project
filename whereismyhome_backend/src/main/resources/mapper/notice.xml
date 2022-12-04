@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.model.mapper.NoticeMapper">
+
+	<insert id="add">
+		insert into notice (user_idx, title, content) values
+		(#{userIdx}, #{title}, #{content})
+	</insert>
+
+	<update id="edit">
+		update notice set title = #{title}, content =
+		#{content} where notice_idx=#{noticeIdx}
+	</update>
+
+	<delete id="delete">
+		delete from notice where notice_idx = #{param1}
+	</delete>
+
+	<!-- 총  공지사항 개수 출력 -->
+	<select id="countNotice" resultType="int">
+		select count(*) from notice
+	</select>
+
+	<select id="list" resultType="user_notice">
+		select A.notice_idx noticeIdx,
+		A.user_idx userIdx, A.title, A.content, A.registerDate, B.name,
+		B.userId
+		from notice A, user B
+		where A.user_idx = B.idx
+		order by A.registerDate desc
+		limit #{start}, #{end}
+	</select>
+
+	<select id="view" resultType="user_notice">
+		select A.notice_idx noticeIdx,
+		A.user_idx userIdx, A.title, A.content, A.registerDate, B.name, B.userId
+		from notice A, user B
+		where A.user_idx = B.idx AND notice_idx = #{parma1}
+	</select>
+
+</mapper>
